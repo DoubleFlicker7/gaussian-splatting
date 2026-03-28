@@ -1,6 +1,5 @@
 docker run \
     -it \
-    --rm \
     --gpus all \
-    3dgs:cu118 \
+    3dgs:cu118_v2.1 \
     bash
