@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     ninja-build \
     ffmpeg \
+    tmux \
     libsm6 \
     libxext6 \
     libxrender1 \
@@ -82,12 +83,13 @@ RUN python -m pip install --upgrade pip==22.3.1 setuptools wheel \
       torch==2.0.0 \
       torchvision==0.15.1 \
       torchaudio==2.0.1 \
-      --index-url https://download.pytorch.org/whl/cu118 \
- && python -m pip install \
+      --index-url https://download.pytorch.org/whl/cu118 
+RUN python -m pip install \
       tqdm \
       plyfile \
       opencv-python \
-      joblib
+      joblib \
+      nvitop
 RUN python -m pip install --no-build-isolation ./submodules/diff-gaussian-rasterization \
  && python -m pip install --no-build-isolation ./submodules/simple-knn \
  && python -m pip install --no-build-isolation ./submodules/fused-ssim
