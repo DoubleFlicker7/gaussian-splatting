@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
     openssh-client \
+    vim \
     curl \
     wget \
     ca-certificates \
@@ -70,6 +71,7 @@ WORKDIR /workspace/gaussian-splatting
 
 # 3) 拷贝代码
 COPY . /workspace/gaussian-splatting
+RUN git config pull.rebase false
 
 # 4) 确保 submodules 已经带进来了
 RUN test -d submodules/diff-gaussian-rasterization \
