@@ -51,7 +51,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
 # 2) 安装 Python 3.8.20（与 environment.yml 对齐）
-ARG PYTHON_VERSION=3.8.20
+ARG PYTHON_VERSION=3.10.20
 RUN cd /tmp \
  && wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
  && tar -xzf Python-${PYTHON_VERSION}.tgz \
@@ -60,8 +60,8 @@ RUN cd /tmp \
  && make -j"$(nproc)" \
  && make altinstall \
  && ldconfig \
- && ln -sf /usr/local/bin/python3.8 /usr/local/bin/python \
- && ln -sf /usr/local/bin/pip3.8 /usr/local/bin/pip \
+ && ln -sf /usr/local/bin/python3.10 /usr/local/bin/python \
+ && ln -sf /usr/local/bin/pip3.10 /usr/local/bin/pip \
  && python --version \
  && pip --version \
  && rm -rf /tmp/Python-${PYTHON_VERSION} /tmp/Python-${PYTHON_VERSION}.tgz
@@ -78,7 +78,7 @@ RUN test -d submodules/diff-gaussian-rasterization \
 
 # 5) 安装 Python 依赖
 #    这里额外 pin 了 numpy<2，避免老版本 PyTorch 在 NumPy 2 上踩坑
-RUN python -m pip install --upgrade pip==22.3.1 setuptools wheel \
+RUN python -m pip install --upgrade pip==23.0.1 setuptools wheel \
  && python -m pip install "numpy<2" \
  && python -m pip install \
       torch==2.0.0 \
