@@ -21,6 +21,7 @@ SHELL ["/bin/bash", "-lc"]
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
+    openssh-client \
     curl \
     wget \
     ca-certificates \
