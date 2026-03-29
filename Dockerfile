@@ -92,7 +92,8 @@ RUN python -m pip install \
       plyfile \
       opencv-python \
       joblib \
-      nvitop
+      nvitop \
+      tensorboard
 RUN python -m pip install --no-build-isolation ./submodules/diff-gaussian-rasterization \
  && python -m pip install --no-build-isolation ./submodules/simple-knn \
  && python -m pip install --no-build-isolation ./submodules/fused-ssim
