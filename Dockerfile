@@ -1,3 +1,4 @@
+
 FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -51,8 +52,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xz-utils \
  && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p -m 0700 /root/.ssh \
+    && ssh-keyscan github.com >> /root/.ssh/known_hosts
+
 # 2) 安装 Python 3.8.20（与 environment.yml 对齐）
-ARG PYTHON_VERSION=3.10.20
+ARG PYTHON_VERSION=3.9.25
 RUN cd /tmp \
  && wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
  && tar -xzf Python-${PYTHON_VERSION}.tgz \
@@ -61,16 +65,18 @@ RUN cd /tmp \
  && make -j"$(nproc)" \
  && make altinstall \
  && ldconfig \
- && ln -sf /usr/local/bin/python3.10 /usr/local/bin/python \
- && ln -sf /usr/local/bin/pip3.10 /usr/local/bin/pip \
+ && ln -sf /usr/local/bin/python3.9 /usr/local/bin/python \
+ && ln -sf /usr/local/bin/pip3.9 /usr/local/bin/pip \
  && python --version \
  && pip --version \
  && rm -rf /tmp/Python-${PYTHON_VERSION} /tmp/Python-${PYTHON_VERSION}.tgz
 
-WORKDIR /workspace/gaussian-splatting
+WORKDIR /workspace
 
 # 3) 拷贝代码
-COPY . /workspace/gaussian-splatting
+RUN --mount=type=ssh git clone git@github.com:DoubleFlicker7/gaussian-splatting.git --recursive
+WORKDIR /workspace/gaussian-splatting
+
 RUN git config pull.rebase false
 
 # 4) 确保 submodules 已经带进来了
@@ -81,10 +87,10 @@ RUN test -d submodules/diff-gaussian-rasterization \
 # 5) 安装 Python 依赖
 #    这里额外 pin 了 numpy<2，避免老版本 PyTorch 在 NumPy 2 上踩坑
 RUN python -m pip install --upgrade pip==23.0.1 setuptools wheel \
- && python -m pip install "numpy<2" \
- && python -m pip install \
-      torch==2.0.0 \
-      torchvision==0.15.1 \
+ && python -m pip install "numpy<2" 
+COPY wheel/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl /tmp/
+RUN python -m pip install /tmp/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl
+RUN python -m pip install torchvision==0.15.1 \
       torchaudio==2.0.1 \
       --index-url https://download.pytorch.org/whl/cu118 
 RUN python -m pip install \
@@ -94,6 +100,8 @@ RUN python -m pip install \
       joblib \
       nvitop \
       tensorboard
+RUN python -m pip install --upgrade pip wheel \
+ && python -m pip install "setuptools<82" packaging ninja
 RUN python -m pip install --no-build-isolation ./submodules/diff-gaussian-rasterization \
  && python -m pip install --no-build-isolation ./submodules/simple-knn \
  && python -m pip install --no-build-isolation ./submodules/fused-ssim
