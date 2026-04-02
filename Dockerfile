@@ -55,7 +55,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN mkdir -p -m 0700 /root/.ssh \
     && ssh-keyscan github.com >> /root/.ssh/known_hosts
 
-# 2) 安装 Python 3.8.20（与 environment.yml 对齐）
+# 2) 安装 Python 3.9.25（与 environment.yml 对齐）
 ARG PYTHON_VERSION=3.9.25
 RUN cd /tmp \
  && wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
@@ -87,16 +87,17 @@ RUN test -d submodules/diff-gaussian-rasterization \
 # 5) 安装 Python 依赖
 #    这里额外 pin 了 numpy<2，避免老版本 PyTorch 在 NumPy 2 上踩坑
 RUN python -m pip install --upgrade pip==23.0.1 setuptools wheel \
- && python -m pip install "numpy<2" 
+ && python -m pip install "numpy==1.26.4" 
 COPY wheel/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl /tmp/
 RUN python -m pip install /tmp/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl
+RUN rm -f /tmp/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl
 RUN python -m pip install torchvision==0.15.1 \
       torchaudio==2.0.1 \
       --index-url https://download.pytorch.org/whl/cu118 
 RUN python -m pip install \
       tqdm \
       plyfile \
-      opencv-python \
+      opencv-python==4.11.0.86 \
       joblib \
       nvitop \
       tensorboard
