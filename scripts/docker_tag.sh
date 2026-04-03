@@ -1,0 +1,1 @@
+docker tag 3dgs:v2.7 tsnami/ict-journey:3dgs.v2.7

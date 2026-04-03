@@ -88,9 +88,8 @@ RUN test -d submodules/diff-gaussian-rasterization \
 #    这里额外 pin 了 numpy<2，避免老版本 PyTorch 在 NumPy 2 上踩坑
 RUN python -m pip install --upgrade pip==23.0.1 setuptools wheel \
  && python -m pip install "numpy==1.26.4" 
-COPY wheel/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl /tmp/
-RUN python -m pip install /tmp/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl
-RUN rm -f /tmp/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl
+RUN --mount=type=bind,source=wheel/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl,target=/tmp/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl,readonly \
+    python -m pip install /tmp/torch-2.0.0+cu118-cp39-cp39-linux_x86_64.whl
 RUN python -m pip install torchvision==0.15.1 \
       torchaudio==2.0.1 \
       --index-url https://download.pytorch.org/whl/cu118 
